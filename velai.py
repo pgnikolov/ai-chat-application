@@ -36,8 +36,6 @@ def send_message(event=None):
     response = get_ai_response(user_input)
     chat_history.insert(tk.END, 'Velai: ', 'ai_label')
     chat_history.insert(tk.END, response + '\n', 'ai_response')
-
-    # Scroll to the bottom
     chat_history.yview(tk.END)
 
 
@@ -59,19 +57,18 @@ chat_frame.place(relwidth=0.7, relheight=0.6, relx=0.15, rely=0.1)
 chat_history = scrolledtext.ScrolledText(chat_frame, wrap=tk.WORD, state='normal')
 chat_history.pack(fill=tk.BOTH, expand=True)
 
-# Define tags for different fonts
+# tags for different fonts
 chat_history.tag_config('user_input', font=("Helvetica", 12), foreground="green")
 chat_history.tag_config('user_label', font=("Helvetica", 12, "bold"), foreground="darkgreen")
-chat_history.tag_config('ai_response', font=("Helvetica", 12), foreground="blue")
+chat_history.tag_config('ai_response', font=("Helvetica", 12), foreground="black")
 chat_history.tag_config('ai_label', font=("Helvetica", 12, "bold"), foreground="red")
 
 user_entry = tk.Entry(root, font=("Helvetica", 14))
 user_entry.place(relwidth=0.7, relheight=0.07, relx=0.15, rely=0.75)
 
-# Bind the Enter key to the send_message function
+# enter key to the send_message
 user_entry.bind("<Return>", send_message)
 
-# Send button
 send_button = tk.Button(root, text="Send", font=("Helvetica", 14), command=send_message)
 send_button.place(relwidth=0.2, relheight=0.07, relx=0.65, rely=0.75)
 
