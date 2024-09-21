@@ -1,7 +1,6 @@
 from groq import Groq
-import tkinter as tk
-from tkinter import scrolledtext
-from PIL import Image, ImageTk
+from datetime import datetime
+from deep_translator import GoogleTranslator
 
 client = Groq(
     api_key="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",
@@ -23,53 +22,62 @@ def get_ai_response(user_input):
     except Exception as e:
         return f"Error: {e}"
 
-def send_message(event=None):
-    user_input = user_entry.get()
+def save_chat_history(user_input, response, filename="chat_history.txt"):
+    with open(filename, "a") as file:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        file.write(f"{timestamp} - You: {user_input}\n{timestamp} - AI: {response}\n")
 
-    if user_input.strip() == "":
-        return
+def load_chat_history(filename="chat_history.txt"):
+    try:
+        with open(filename, "r") as file:
+            return file.read()
+    except FileNotFoundError:
+        return "No chat history found."
 
-    chat_history.insert(tk.END, 'You: ', 'user_label')
-    chat_history.insert(tk.END, user_input + '\n', 'user_input')
-    user_entry.delete(0, tk.END)
+def clear_chat_history(filename="chat_history.txt"):
+    with open(filename, "w") as file:
+        file.write("")
 
-    response = get_ai_response(user_input)
-    chat_history.insert(tk.END, 'Velai: ', 'ai_label')
-    chat_history.insert(tk.END, response + '\n', 'ai_response')
-    chat_history.yview(tk.END)
+def translate_to_language(text, dest_language):
+    translated = GoogleTranslator(source='auto', target=dest_language).translate(text)
+    return translated
 
+def main():
+    print("Welcome to the AI Chat! Type 'exit' to end the conversation.")
+    print("Type '!history' to view chat history.")
+    print("Type '!clear' to clear chat history.")
+    print("Type '!lang [language_code]' to change the language.")
+    print("Type '!langs' to display supported languages.")
 
-root = tk.Tk()
-root.title("Velai Chat AI with Groq API")  # Updated title
+    language = "en"
 
-window_width = 1024
-window_height = 683
-root.geometry(f"{window_width}x{window_height}")
+    while True:
+        user_input = input("You: ")
 
-bg_image = Image.open("img-ai.jpg")
-bg_photo = ImageTk.PhotoImage(bg_image)
-background_label = tk.Label(root, image=bg_photo)
-background_label.place(relwidth=1, relheight=1)
+        if user_input.lower() == "exit":
+            print("Goodbye!")
+            break
+        elif user_input.lower() == "!history":
+            print(load_chat_history())
+            continue
+        elif user_input.lower() == "!clear":
+            clear_chat_history()
+            print("Chat history cleared.")
+            continue
+        elif user_input.lower().startswith("!lang"):
+            language = user_input.split(" ", 1)[1]
+            print(f"Language changed to {language}.")
+            continue
+        elif user_input.lower() == "!langs":
+            print("Supported languages: en (English), bg (Bulgarian) and others.....")  # other langs acc to the needs
 
-chat_frame = tk.Frame(root, bg="#f7f7f7", bd=5)
-chat_frame.place(relwidth=0.7, relheight=0.6, relx=0.15, rely=0.1)
+        translated_input = translate_to_language(user_input, language)
+        response = get_ai_response(translated_input)
+        translated_response = translate_to_language(response, language)
 
-chat_history = scrolledtext.ScrolledText(chat_frame, wrap=tk.WORD, state='normal')
-chat_history.pack(fill=tk.BOTH, expand=True)
+        print(f"AI: {translated_response}")
 
-# tags for different fonts
-chat_history.tag_config('user_input', font=("Helvetica", 12), foreground="green")
-chat_history.tag_config('user_label', font=("Helvetica", 12, "bold"), foreground="darkgreen")
-chat_history.tag_config('ai_response', font=("Helvetica", 12), foreground="black")
-chat_history.tag_config('ai_label', font=("Helvetica", 12, "bold"), foreground="red")
+        save_chat_history(user_input, translated_response)
 
-user_entry = tk.Entry(root, font=("Helvetica", 14))
-user_entry.place(relwidth=0.7, relheight=0.07, relx=0.15, rely=0.75)
-
-# enter key to the send_message
-user_entry.bind("<Return>", send_message)
-
-send_button = tk.Button(root, text="Send", font=("Helvetica", 14), command=send_message)
-send_button.place(relwidth=0.2, relheight=0.07, relx=0.65, rely=0.75)
-
-root.mainloop()
+if __name__ == "__main__":
+    main()
