@@ -9,3 +9,4 @@ Language Translation: Automatically translates user input and AI responses using
 Chat History Management: Save, load, and clear chat history.
 Multi-language Support: Change the language of the conversation with simple commands.
 
+
