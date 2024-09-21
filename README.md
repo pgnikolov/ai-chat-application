@@ -8,3 +8,4 @@ AI-Powered Conversations: Uses Groq's llama3-8b-8192 model to generate AI respon
 Language Translation: Automatically translates user input and AI responses using deep_translator.
 Chat History Management: Save, load, and clear chat history.
 Multi-language Support: Change the language of the conversation with simple commands.
+
